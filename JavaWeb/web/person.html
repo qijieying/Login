@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Person</title>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.min.js"></script>
+</head>
+<body>
+<h1>个人中心</h1>
+<div id="app">
+    <div v-if="login"><span>请登录</span></div>
+    <div v-if="person"><span>用户名:{{userName}}</span></div>
+</div>
+<script type="text/javascript">
+    var vm=new Vue({
+        el:'#app',
+        data:{
+            userName:"",
+            login:true,
+            person:false
+        },
+        created: function (){
+            self=this;
+            axios("LoadPersonInfo").then(function (response){
+                if(response.data!="error") {
+                    self.person=true;
+                    self.login=false;
+                    self.userName=response.data;
+                }
+                else{
+                    self.person=false;
+                    self.login=true;
+                }
+            }).catch(function (error){})
+        }
+    });
+</script>
+</body>
+</html>

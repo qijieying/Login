@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>网上书店</title>
+    <style>
+        .add{border:1px solid #eee;margin:10px 0;padding:15px;}
+        .window{background-image: url("img/123.jpg");-moz-opacity: 0.8;opacity: .80;width: 100%;height: 100%;position: fixed;z-index: 4;
+        top: 0;left: 0;}
+        .loginbox{width: 400px;height: 350px;background: rgba(255,255,255,1);position: absolute;left: 0;top:0;right: 0;bottom: 0;margin: auto;
+        z-index: 47;border-radius: 10px}
+        .context{padding: 10px 10px;}
+        .context input{width: 200px;margin-bottom: 15px;}
+    </style>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <div style="width: 800px;margin: auto;" align="left">
+        <h2 align="center">网上书店</h2>
+        <a href="javascript:void(0)"@click="login()">登录</a>
+        <a href="javascript:void(0)">注册</a>
+        <a v-show="personCenter" onclick="window.open('person.html')" href="javascript:void(0)">个人中心</a>
+        <a href="javascript:void(0)" @click="exit">安全退出</a><span>{{welcomeMess}}</span>
+    </div>
+    <div style="width:800px;height:400px;margin:auto;background:#d4dedf"align="center">
+        <span ><font size=8>欢迎进入网上书店</font></span>
+    </div>
+    <div v-show="window" class="window">
+        <div class="loginbox" v-if="show_loginbox">
+            <h1 align="center">用户登录</h1>
+            <div class="context"></div>
+            <form @submit.prevent="onsubmit" method="post">
+            <br>输入账号:<br>
+                <Input type="text" v-model="userName"></Input>
+            <br>输入密码:<br>
+                <Input type="password" v-model="password"></Input>
+                <br><Input type=submit name="g" value="提交"></Input><br>
+                    <span>{{promptMess}}</span>
+            </form>
+            <p align="right">
+                <a href="javascript:void(0)" @click="returnMain">返回主页面</a>
+            </p>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm=new Vue({
+            el: '#app',
+            data:{
+                welcomeMess:"",
+                promptMess:"",
+                userName:"",
+                password:"",
+                personCenter:false,
+                show_loginbox:false,
+                window:false
+            },
+            methods:{
+                login:function (){
+                    this.show_loginbox=true;
+                    this.window=true;
+                },
+                returnMain:function () {
+                    this.show_loginbox=false;
+                    this.window=false;
+                },
+                onsubmit:function () {
+                    var self=this;
+                    axios({
+                        url:"LoginAjax",
+                        method:"post",
+                        data:{
+                            name:this.userName,
+                            pass:this.password
+                        }
+                    }).then(function (response){
+                        if(response.data=="error")
+                            self.promptMess="密码或用户名错误！";
+                        else {
+                            alert(response.data);
+                            self.show_loginbox=false;
+                            self.window=false;
+                            self.personCenter=true;
+                            self.welcomeMess="欢迎你"+response.data;
+                            self.promptMess="";
+                            self.userName="";
+                            self.password="";
+                        }
+                    }).cache(function (error){});
+                },
+                exit:function (){
+                    this.welcomeMess="";
+                    this.personCenter=false;
+                    axios.post("ExitAjax");
+                }
+            }
+        });
+</script>
+</body>
+</html>
